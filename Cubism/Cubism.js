@@ -65,7 +65,7 @@ function Rect3D(x, y, l, w, h){
             c.beginPath();
             c.moveTo(x1, y1);
             c.lineTo(x2, y2);
-            c.fillStyle = "black";
+            c.strokeStyle = "white";
             c.stroke();
 
         }
@@ -89,7 +89,12 @@ function Rect3D(x, y, l, w, h){
 function init(){ 
     var mid_x = innerWidth/2;
     var mid_y = innerHeight/2;
-    var TestCube = new Rect3D(mid_x, mid_y, 200, 200, 200);
+    var width = 200;
+    var length = 200;
+    var height = 100;
+    mid_y += height;
+
+    var TestCube = new Rect3D(mid_x, mid_y, length, width, height);
     TestCube.calculate_points();
     TestCube.draw_connectors();
 }
