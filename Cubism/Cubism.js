@@ -22,23 +22,28 @@ function Point(x, y){
 }
 
 function Rect3D(x, y, l, w, h){
-    this.x = x;
-    this.y = y;
+    this.x_cords = x;
+    this.y_cords = y;
     this.length = l;
     this.width = w;
     this.height = h;
     this.points = []
 
     this.calculate_points = function() {
-        origin = Point(this.x, this.y);
-        p1 = Point(this.x, this.y + this.height);
-        p2 = Point(this.get_angled_points(p1, 45, this.width));
-        p3 = Point(this.get_angled_points(p1, 135, this.length));
-        p4 = Point(p3.x, p3.y - this.height);
-        p5 = Point(p2.x, p2.y - this.height);
-        p6 = Point(this.x, this.y - this.height);
-        //p6 = Point(this.get_angled_points(p3, 45, this.width));
+        var origin = new Point(this.x_cords, this.y_cords);
+        var p1 = new Point(this.x_cords, this.y_cords + this.height);
+        var p2 = this.get_angled_points(p1.x, p1.y, 45, this.width);
+        var p3 = this.get_angled_points(p1.x, p1.y, 135, this.length);
+        var p4 = new Point(p3.x, p3.y - this.height);
+        var p5 = new Point(p2.x, p2.y - this.height);
+        var p6 = new Point(this.x_cords, this.y_cords - this.height);
+        //p6 = Point(this.get_angled_points(p3.x, p3.y , 45, this.width));
         
+        var raw_points = [origin, p1 ,p2 ,p3 ,p4, p5, p6];
+        for (var i = 0; i < raw_points.length; i++){
+            console.log("Point: " + raw_points[i].x + " " + raw_points[i].y);
+        }
+
         this.points = [
             [origin, p1], [origin, p4], [origin, p5],
             [p1, p2], [p1, p3],
@@ -60,6 +65,7 @@ function Rect3D(x, y, l, w, h){
             c.beginPath();
             c.moveTo(x1, y1);
             c.lineTo(x2, y2);
+            c.fillStyle = "black";
             c.stroke();
 
         }
@@ -69,10 +75,10 @@ function Rect3D(x, y, l, w, h){
         return degrees * (Math.PI/180);
     }
 
-    this.get_angled_points = function(point, degree, length){
-        degrees = this.convert_to_radians(degree);
-        angled_x = point.x + length * Math.cos(degrees);
-        angled_y = point.y + length * Math.sin(degrees);
+    this.get_angled_points = function(px, py, degree, length){
+        var degrees = this.convert_to_radians(degree);
+        var angled_x = px + length * Math.cos(degrees);
+        var angled_y = py - length * Math.sin(degrees);
 
         return new Point(angled_x, angled_y)
 
@@ -83,7 +89,7 @@ function Rect3D(x, y, l, w, h){
 function init(){ 
     var mid_x = innerWidth/2;
     var mid_y = innerHeight/2;
-    var TestCube = new Rect3D(mid_x, mid_y, 100, 100, 100);
+    var TestCube = new Rect3D(mid_x, mid_y, 200, 200, 100);
     TestCube.calculate_points();
     TestCube.draw_connectors();
 }
