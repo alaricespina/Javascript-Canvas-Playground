@@ -36,8 +36,8 @@ function Rect3D(x, y, l, w, h){
         var p3 = this.get_angled_points(p1.x, p1.y, 135, this.length);
         var p4 = new Point(p3.x, p3.y - this.height);
         var p5 = new Point(p2.x, p2.y - this.height);
-        var p6 = new Point(this.x_cords, this.y_cords - this.height);
-        //p6 = Point(this.get_angled_points(p3.x, p3.y , 45, this.width));
+        //var p6 = new Point(this.x_cords, this.y_cords - this.height);
+        var p6 = this.get_angled_points(p4.x, p4.y , 45, this.width);
         
         var raw_points = [origin, p1 ,p2 ,p3 ,p4, p5, p6];
         for (var i = 0; i < raw_points.length; i++){
@@ -89,7 +89,7 @@ function Rect3D(x, y, l, w, h){
 function init(){ 
     var mid_x = innerWidth/2;
     var mid_y = innerHeight/2;
-    var TestCube = new Rect3D(mid_x, mid_y, 200, 200, 100);
+    var TestCube = new Rect3D(mid_x, mid_y, 200, 200, 200);
     TestCube.calculate_points();
     TestCube.draw_connectors();
 }
