@@ -106,9 +106,9 @@ function create_cube_once(w, l , h, cx, cy) {
 var NewCube;
 
 function init(){ 
-    var width = 1;
-    var length = 1;
-    var height = 1;
+    var width = 100;
+    var length = 100;
+    var height = 100;
     var mid_x = innerWidth/2;
     var mid_y = innerHeight/2;
 
@@ -118,77 +118,8 @@ function init(){
     
 }
 
-var max_width = 200;
-var max_height = 200;
-var max_length = 200;
-var mid_x = innerWidth/2;
-var mid_y = innerHeight/2;
-var dw = 2;
-var dh = 2;
-var dl = 2;
-
-var state = 0;
-
-function animate() {
-    
-    if (evaluateBounds(max_width, max_height, max_length, state)){
-        state += 1;
-        console.log(state);
-    }
-    if (state > 5){
-        state = 0;
-    }
-
-    evaluateState(state);
-   
-    c.clearRect(0, 0, innerWidth, innerHeight);
-
-    NewCube.draw_figure();
-
-
-    requestAnimationFrame(animate);
-    
-}
-
-function evaluateBounds(max_width, max_height, max_length, state){
-    var cond1 = (NewCube.width >= max_width) && (state == 0);
-    var cond2 = (NewCube.height >= max_height) && (state == 1);
-    var cond3 = (NewCube.length >= max_length) && (state == 2);
-    var cond4 = (NewCube.width <= 0) && (state == 3);
-    var cond5 = (NewCube.height <= 0) && (state == 4);
-    var cond6 = (NewCube.length <= 0) && (state == 5);
-    var result = cond1 || cond2 || cond3 || cond4 || cond5 || cond6;
-    return result;
-}
-
-function evaluateState(state) {
-    // 0 - Width, 1 - Height, Length - 2
-    // 3 - Width <, 4 - Height <, 5 - Length <
-    switch (state) {
-        case 0:
-            NewCube.width += dw;
-            break;
-        case 1:
-            NewCube.height += dh;
-            break;
-        case 2:
-            NewCube.length += dl;
-            break;
-        case 3:
-            NewCube.width -= dw;
-            break;
-        case 4:
-            NewCube.height -= dh;
-            break;
-        case 5:
-            NewCube.length -= dl;
-            break;
-
-    }
-}
-
 init();
-animate();
+
 
 
 
