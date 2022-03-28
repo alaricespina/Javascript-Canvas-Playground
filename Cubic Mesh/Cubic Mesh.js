@@ -95,11 +95,20 @@ function CubeMesh(numx, numy, padding){
     this.partitions_y = numy; 
     this.pad = padding;
     
-    this.cu_height = innerHeight / numy - (2 * this.pad);
-    this.cu_width = this.cu_length = this.cu_height;
-    
+    //this.cu_height = innerHeight / numy - (2 * this.pad);    
     this.bound_lengths = innerHeight/3;
-    console.log(this.bound_lengths);
+    //console.log(this.bound_lengths);
+
+    this.cu_height = this.bound_lengths / numy;
+    this.cu_width = this.cu_length = this.cu_height;
+
+    console.log("INIT: " + this.cu_height);
+
+    this.partitions = new Array(this.partitions_x);
+    for (var i = 0; i < this.partitions.length; i++){
+        this.partitions[i] = new Array(this.partitions_y);
+    }
+
     this.show_mesh_bounds = function() {
        c.beginPath()
        c.strokeStyle = "white";
@@ -127,19 +136,63 @@ function CubeMesh(numx, numy, padding){
         var degrees = this.convert_to_radians(degree);
         var angled_x = px + (length * Math.cos(degrees));
         var angled_y = py - (length * Math.sin(degrees));
-        console.log(angled_x);
+        //console.log(angled_x);
         return new Point(angled_x, angled_y)
     }
 
     this.calculate_bounds = function() {
-        this.origin = new Point(innerWidth/2, innerHeight/2);
+        var offset_height = innerHeight/2 + this.bound_lengths/2;
+        this.origin = new Point(innerWidth/2, offset_height);
         this.right_bound = this.get_angled_points(this.origin.x, this.origin.y, 45, this.bound_lengths);
         this.left_bound = this.get_angled_points(this.origin.x, this.origin.y, 135, this.bound_lengths);
         this.upper_bound = this.get_angled_points(this.left_bound.x, this.left_bound.y, 45, this.bound_lengths);
-
     }  
+   
+    this.calculate_partitions = function () {
+        var segment_x = this.bound_lengths / this.partitions_x;
+        var segment_y = this.bound_lengths / this.partitions_y;
+        for (var i = 0; i < this.partitions_x; i++){
+            var offset_origin = this.get_angled_points(this.origin.x, this.origin.y, 135, segment_x * i);
+            for (var j = 0; j < this.partitions_y; j++) {
+                var mesh_point = this.get_angled_points(offset_origin.x, offset_origin.y, 45, segment_y * j);
+                this.partitions[i][j] = mesh_point;
+            }
+        }
 
+        console.log(this.partitions);
+    }
 
+    this.show_partitions = function() {
+        for (var i = 0; i < this.partitions.length; i++){
+            for (var j = 0; j < this.partitions[i].length - 1; j++){
+                
+                var x1 = this.partitions[i][j].x;
+                var y1 = this.partitions[i][j].y;
+                var x2 = this.partitions[i][j+1].x;
+                var y2 = this.partitions[i][j+1].y;
+                
+                console.log("I:"+ i + " J:" + j + " ARRAY: " + x1, y1, x2, y2);
+                c.beginPath();
+                c.moveTo(x1, y1);
+                c.lineTo(x2, y2);
+                c.strokeStyle = "white";
+                c.stroke();
+
+            }
+        }
+    }
+
+    this.show_cubes = function() {
+        for (var i = 0; i < this.partitions_x; i++){
+            for (var j = 0; j < this.partitions_y; j++){
+                var x = this.partitions[i][j].x;
+                var y = this.partitions[i][j].y;
+                var new_cube = new Rect3D(x, y, this.cu_length, this.cu_width, this.cu_height);
+                new_cube.draw_figure();
+                console.log(this.cu_width);
+            }
+        }
+    }
 
 
 }
@@ -171,7 +224,13 @@ function init(){
 
     var CM = new CubeMesh(2, 2, 10);
     CM.calculate_bounds();
-    CM.show_mesh_bounds();
+    //CM.show_mesh_bounds();
+
+    CM.calculate_partitions();
+    //CM.show_partitions();
+
+    CM.show_cubes();
+
    
     
 }
