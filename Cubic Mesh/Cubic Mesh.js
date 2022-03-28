@@ -90,6 +90,60 @@ function Rect3D(x, y, l, w, h){
     }
 }
 
+function CubeMesh(numx, numy, padding){
+    this.partitions_x = numx;
+    this.partitions_y = numy; 
+    this.pad = padding;
+    
+    this.cu_height = innerHeight / numy - (2 * this.pad);
+    this.cu_width = this.cu_length = this.cu_height;
+    
+    this.bound_lengths = innerHeight/3;
+    console.log(this.bound_lengths);
+    this.show_mesh_bounds = function() {
+       c.beginPath()
+       c.strokeStyle = "white";
+       c.moveTo(this.origin.x, this.origin.y);
+       c.lineTo(this.right_bound.x, this.right_bound.y);
+       c.stroke();
+       c.lineTo(this.upper_bound.x, this.upper_bound.y);
+       c.stroke();
+       c.lineTo(this.left_bound.x, this.left_bound.y);
+       c.stroke();
+       c.lineTo(this.origin.x, this.origin.y);
+       c.stroke();
+
+       console.log(this.origin.x + " " + this.right_bound.x + " " + this.upper_bound.x + " " + this.left_bound.x)
+       
+       console.log("Mesh shown");
+
+    }
+
+    this.convert_to_radians = function(degrees) {
+        return degrees * (Math.PI/180);
+    }
+
+    this.get_angled_points = function(px, py, degree, length){
+        var degrees = this.convert_to_radians(degree);
+        var angled_x = px + (length * Math.cos(degrees));
+        var angled_y = py - (length * Math.sin(degrees));
+        console.log(angled_x);
+        return new Point(angled_x, angled_y)
+    }
+
+    this.calculate_bounds = function() {
+        this.origin = new Point(innerWidth/2, innerHeight/2);
+        this.right_bound = this.get_angled_points(this.origin.x, this.origin.y, 45, this.bound_lengths);
+        this.left_bound = this.get_angled_points(this.origin.x, this.origin.y, 135, this.bound_lengths);
+        this.upper_bound = this.get_angled_points(this.left_bound.x, this.left_bound.y, 45, this.bound_lengths);
+
+    }  
+
+
+
+
+}
+
 function create_cube_once(w, l , h, cx, cy) {
     var mid_x = cx;
     var mid_y = cy;
@@ -103,7 +157,7 @@ function create_cube_once(w, l , h, cx, cy) {
 
 }
 
-var NewCube;
+
 
 function init(){ 
     var width = 100;
@@ -111,9 +165,13 @@ function init(){
     var height = 100;
     var mid_x = innerWidth/2;
     var mid_y = innerHeight/2;
+    
+    var NewCube = create_cube_once(width, length, height, mid_x, mid_y);
+    //NewCube.draw_figure();
 
-    NewCube = create_cube_once(width, length, height, mid_x, mid_y);
-    NewCube.draw_figure();
+    var CM = new CubeMesh(2, 2, 10);
+    CM.calculate_bounds();
+    CM.show_mesh_bounds();
    
     
 }
