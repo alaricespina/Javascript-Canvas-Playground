@@ -28,6 +28,9 @@ function Rect3D(x, y, l, w, h){
     this.width = w;
     this.height = h;
     this.points = []
+    this.darkest_color = "#33AED0";
+    this.medium_color = "#3DC4EA";
+    this.lightest_color = "#3AD3FE";
 
     this.calculate_points = function() {
         var origin = new Point(this.x_cords, this.y_cords);
@@ -50,6 +53,45 @@ function Rect3D(x, y, l, w, h){
             [p3, p4], [p4, p6],
             [p2, p5], [p5, p6]            
         ]
+
+        this.raw_points = [origin, p1, p2, p3, p4, p5, p6];
+    }
+
+    this.draw_planes = function() {
+
+        c.fillStyle = this.medium_color;
+        // Plane 1 - Right
+        c.beginPath();
+        c.moveTo(this.raw_points[0].x, this.raw_points[0].y);
+        c.lineTo(this.raw_points[1].x, this.raw_points[1].y);
+        c.lineTo(this.raw_points[2].x, this.raw_points[2].y);
+        c.lineTo(this.raw_points[5].x, this.raw_points[5].y);
+        c.lineTo(this.raw_points[0].x, this.raw_points[0].y);
+        c.closePath()
+        c.fill();
+
+        c.fillStyle = this.darkest_color;
+        // Plane 2 - Left
+        c.beginPath();
+        c.moveTo(this.raw_points[0].x, this.raw_points[0].y);
+        c.lineTo(this.raw_points[1].x, this.raw_points[1].y);
+        c.lineTo(this.raw_points[3].x, this.raw_points[3].y);
+        c.lineTo(this.raw_points[4].x, this.raw_points[4].y);
+        c.lineTo(this.raw_points[0].x, this.raw_points[0].y);
+        c.closePath()
+        c.fill();
+
+        // Plabe 3 - Top
+        c.fillStyle = this.lightest_color;
+        c.beginPath();
+        c.moveTo(this.raw_points[0].x, this.raw_points[0].y);
+        c.lineTo(this.raw_points[5].x, this.raw_points[5].y);
+        c.lineTo(this.raw_points[6].x, this.raw_points[6].y);
+        c.lineTo(this.raw_points[4].x, this.raw_points[4].y);
+        c.lineTo(this.raw_points[0].x, this.raw_points[0].y);
+        c.closePath()
+        c.fill();
+    
     }
 
     this.draw_connectors = function() {
@@ -189,6 +231,7 @@ function CubeMesh(numx, numy, padding){
                 var y = this.partitions[i][j].y;
                 var new_cube = new Rect3D(x, y, this.cu_length, this.cu_width, this.cu_height);
                 new_cube.draw_figure();
+                new_cube.draw_planes();
                 console.log(this.cu_width);
             }
         }
