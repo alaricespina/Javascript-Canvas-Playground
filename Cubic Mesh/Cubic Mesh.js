@@ -224,21 +224,37 @@ function CubeMesh(numx, numy, padding){
         }
     }
 
-    this.show_cubes = function() {
+    this.create_unoredered_cubes = function() {
         for (var i = 0; i < this.partitions_x; i++){
             for (var j = 0; j < this.partitions_y; j++){
                 var x = this.partitions[i][j].x;
                 var y = this.partitions[i][j].y;
                 var new_cube = new Rect3D(x, y, this.cu_length, this.cu_width, this.cu_height);
-                new_cube.draw_figure();
-                new_cube.draw_planes();
-                console.log(this.cu_width);
             }
         }
     }
 
+    this.show_unordered_cubes = function() {
+        for (var i = 0; i < this.partitions_x; i++){
+            for (var j = 0; j < this.partitions_y; j++){
+                this.partitions[i][j].draw_figure();
+                this.partitions[i][j].draw_planes();
+            }
+        }
+    }
+
+    this.order_partitions_to_dictionary = function() {
+        this.partitions_dict = {};
+    }
+
+    this.display_by_dictionary = function() {
+
+    }
+
 
 }
+
+
 
 function create_cube_once(w, l , h, cx, cy) {
     var mid_x = cx;
@@ -272,7 +288,8 @@ function init(){
     CM.calculate_partitions();
     //CM.show_partitions();
 
-    CM.show_cubes();
+    CM.create_unoredered_cubes();
+    CM.show_unordered_cubes();
 
    
     
