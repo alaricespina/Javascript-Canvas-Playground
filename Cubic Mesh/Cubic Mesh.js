@@ -31,6 +31,7 @@ function Rect3D(x, y, l, w, h){
     this.darkest_color = "#33AED0";
     this.medium_color = "#3DC4EA";
     this.lightest_color = "#3AD3FE";
+    this.clear_color = "black";
 
     this.calculate_points = function() {
         var origin = new Point(this.x_cords, this.y_cords);
@@ -55,6 +56,42 @@ function Rect3D(x, y, l, w, h){
         ]
 
         this.raw_points = [origin, p1, p2, p3, p4, p5, p6];
+    }
+
+    this.clear_area = function() {
+
+        c.fillStyle = this.clear_color;
+        // Plane 1 - Right
+        c.beginPath();
+        c.moveTo(this.raw_points[0].x, this.raw_points[0].y);
+        c.lineTo(this.raw_points[1].x, this.raw_points[1].y);
+        c.lineTo(this.raw_points[2].x, this.raw_points[2].y);
+        c.lineTo(this.raw_points[5].x, this.raw_points[5].y);
+        c.lineTo(this.raw_points[0].x, this.raw_points[0].y);
+        c.closePath()
+        c.fill();
+
+        c.fillStyle = this.clear_color;
+        // Plane 2 - Left
+        c.beginPath();
+        c.moveTo(this.raw_points[0].x, this.raw_points[0].y);
+        c.lineTo(this.raw_points[1].x, this.raw_points[1].y);
+        c.lineTo(this.raw_points[3].x, this.raw_points[3].y);
+        c.lineTo(this.raw_points[4].x, this.raw_points[4].y);
+        c.lineTo(this.raw_points[0].x, this.raw_points[0].y);
+        c.closePath()
+        c.fill();
+
+        // Plabe 3 - Top
+        c.fillStyle = this.clear_color;
+        c.beginPath();
+        c.moveTo(this.raw_points[0].x, this.raw_points[0].y);
+        c.lineTo(this.raw_points[5].x, this.raw_points[5].y);
+        c.lineTo(this.raw_points[6].x, this.raw_points[6].y);
+        c.lineTo(this.raw_points[4].x, this.raw_points[4].y);
+        c.lineTo(this.raw_points[0].x, this.raw_points[0].y);
+        c.closePath()
+        c.fill();
     }
 
     this.draw_planes = function() {
@@ -107,7 +144,7 @@ function Rect3D(x, y, l, w, h){
             c.beginPath();
             c.moveTo(x1, y1);
             c.lineTo(x2, y2);
-            c.strokeStyle = "white";
+            c.strokeStyle = "black";
             c.stroke();
 
         }
@@ -115,7 +152,7 @@ function Rect3D(x, y, l, w, h){
 
     this.draw_figure = function() {
         this.calculate_points();
-        this.draw_connectors();
+        //this.draw_connectors();
     }
 
     this.convert_to_radians = function(degrees) {
@@ -183,7 +220,7 @@ function CubeMesh(numx, numy, padding){
     }
 
     this.calculate_bounds = function() {
-        var offset_height = innerHeight/2 + this.bound_lengths/2;
+        var offset_height = innerHeight/2 + this.bound_lengths/2 + this.pad * this.partitions_x;
         this.origin = new Point(innerWidth/2, offset_height);
         this.right_bound = this.get_angled_points(this.origin.x, this.origin.y, 45, this.bound_lengths);
         this.left_bound = this.get_angled_points(this.origin.x, this.origin.y, 135, this.bound_lengths);
@@ -194,9 +231,9 @@ function CubeMesh(numx, numy, padding){
         var segment_x = this.bound_lengths / this.partitions_x;
         var segment_y = this.bound_lengths / this.partitions_y;
         for (var i = 0; i < this.partitions_x; i++){
-            var offset_origin = this.get_angled_points(this.origin.x, this.origin.y, 135, segment_x * i);
+            var offset_origin = this.get_angled_points(this.origin.x, this.origin.y, 135, (segment_x + this.pad) * i);
             for (var j = 0; j < this.partitions_y; j++) {
-                var mesh_point = this.get_angled_points(offset_origin.x, offset_origin.y, 45, segment_y * j);
+                var mesh_point = this.get_angled_points(offset_origin.x, offset_origin.y, 45, (segment_y + this.pad) * j);
                 this.partitions[i][j] = mesh_point;
             }
         }
@@ -230,24 +267,128 @@ function CubeMesh(numx, numy, padding){
                 var x = this.partitions[i][j].x;
                 var y = this.partitions[i][j].y;
                 var new_cube = new Rect3D(x, y, this.cu_length, this.cu_width, this.cu_height);
-            }
-        }
-    }
 
-    this.show_unordered_cubes = function() {
-        for (var i = 0; i < this.partitions_x; i++){
-            for (var j = 0; j < this.partitions_y; j++){
-                this.partitions[i][j].draw_figure();
-                this.partitions[i][j].draw_planes();
+                new_cube.draw_figure();
+                new_cube.draw_planes();
             }
         }
     }
 
     this.order_partitions_to_dictionary = function() {
-        this.partitions_dict = {};
+        this.partitions_dict = [];
+        var x_add;
+        var y_add;
+        var x_trav;
+        var y_trav;
+        var counter = 0;
+        console.log("X LOOP");
+        for (x_trav = this.partitions_x - 1; x_trav >= 0; x_trav--){
+            x_add = 1;
+            y_add = 1;
+            y_trav = this.partitions_y - 1;
+            console.log("X-TRAV: " + x_trav + " Y-TRAV: " + y_trav);
+            this.partitions_dict[counter] = [];
+            this.partitions_dict[counter].push(this.partitions[x_trav][y_trav]);
+          
+            while (x_trav + x_add < this.partitions_x){
+                    console.log("Inside : X-TRAV: " + (x_trav + x_add) + " Y-TRAV: " + (y_trav - y_add));
+                    var item = this.partitions[x_trav+x_add][y_trav-y_add]
+                    this.partitions_dict[counter].push(item);
+                    
+                    y_add += 1;
+                    x_add += 1;
+            }
+
+            counter += 1;
+        }
+
+        console.log("Y LOOP");
+        for (y_trav = this.partitions_y - 2; y_trav >= 0 ; y_trav--){
+            x_add = 1;
+            y_add = 1;
+            x_trav = 0;
+            console.log("X-TRAV: " + x_trav + "Y-TRAV: " + y_trav);
+            this.partitions_dict[counter] = [];
+            this.partitions_dict[counter].push(this.partitions[x_trav][y_trav]);
+          
+            while (y_trav - y_add >= 0 ){
+                    console.log("Inside : X-TRAV: " + (x_trav + x_add) + "Y-TRAV: " + (y_trav - y_add));
+                    var item = this.partitions[x_trav+x_add][y_trav-y_add]
+                    this.partitions_dict[counter].push(item);
+                    
+                    y_add += 1;
+                    x_add += 1;
+            }
+
+            counter += 1;
+        }
+
+        counter = 0;
+
+        
     }
 
     this.display_by_dictionary = function() {
+        for (var i = 0; i < this.partitions_dict.length; i++){
+            console.log("Index: " + i);
+            console.log(this.partitions_dict[i]);
+        }
+
+        for (var i = 0; i < this.partitions_dict.length; i++){
+            for (var j = 0; j < this.partitions_dict[i].length; j++){
+                var x = this.partitions_dict[i][j].x;
+                var y = this.partitions_dict[i][j].y;
+                var new_cube = new Rect3D(x, y, this.cu_length, this.cu_width, this.cu_height);
+
+                new_cube.draw_figure();
+                new_cube.clear_area();
+                new_cube.draw_planes();
+            }
+        }
+    }
+
+    this.test_drawing = function() {
+        var i = 1;
+        var j = 1;
+        var x = this.partitions[i][j].x;
+        var y = this.partitions[i][j].y;
+        var new_cube2 = new Rect3D(x, y, this.cu_length, this.cu_width, this.cu_height);
+
+        new_cube2.draw_figure();
+        new_cube2.clear_area();
+        new_cube2.draw_planes();
+
+
+
+        var i = 1;
+        var j = 0;
+        var x = this.partitions[i][j].x;
+        var y = this.partitions[i][j].y;
+        var new_cube = new Rect3D(x, y, this.cu_length, this.cu_width, this.cu_height);
+
+        new_cube.draw_figure();
+        new_cube.clear_area();
+        new_cube.draw_planes();
+
+        var i = 0;
+        var j = 1;
+        var x = this.partitions[i][j].x;
+        var y = this.partitions[i][j].y;
+        var new_cube = new Rect3D(x, y, this.cu_length, this.cu_width, this.cu_height);
+
+        new_cube.draw_figure();
+        new_cube.clear_area();
+        new_cube.draw_planes();
+
+        var i = 0;
+        var j = 0;
+        var x = this.partitions[i][j].x;
+        var y = this.partitions[i][j].y;
+        var new_cube = new Rect3D(x, y, this.cu_length, this.cu_width, this.cu_height);
+
+        new_cube.draw_figure();
+        new_cube.clear_area();
+        new_cube.draw_planes();
 
     }
 
@@ -281,16 +422,20 @@ function init(){
     var NewCube = create_cube_once(width, length, height, mid_x, mid_y);
     //NewCube.draw_figure();
 
-    var CM = new CubeMesh(2, 2, 10);
+    var CM = new CubeMesh(12, 12, 5);
     CM.calculate_bounds();
     //CM.show_mesh_bounds();
 
     CM.calculate_partitions();
     //CM.show_partitions();
 
-    CM.create_unoredered_cubes();
-    CM.show_unordered_cubes();
+    //CM.create_unoredered_cubes();
 
+    CM.order_partitions_to_dictionary();
+    CM.display_by_dictionary();
+
+    //CM.test_drawing();
+    
    
     
 }
