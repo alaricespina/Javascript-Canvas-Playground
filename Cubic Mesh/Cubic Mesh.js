@@ -175,7 +175,7 @@ function CubeMesh(numx, numy, padding){
     this.pad = padding;
     
     //this.cu_height = innerHeight / numy - (2 * this.pad);    
-    this.bound_lengths = innerHeight/3;
+    this.bound_lengths = innerHeight/2;
     //console.log(this.bound_lengths);
 
     this.cu_height = this.bound_lengths / numy;
@@ -220,7 +220,7 @@ function CubeMesh(numx, numy, padding){
     }
 
     this.calculate_bounds = function() {
-        var offset_height = innerHeight/2 + this.bound_lengths/2 + this.pad * this.partitions_x;
+        var offset_height = innerHeight/2 + this.bound_lengths/2 + this.pad * (this.partitions_y + this.partitions_x);
         this.origin = new Point(innerWidth/2, offset_height);
         this.right_bound = this.get_angled_points(this.origin.x, this.origin.y, 45, this.bound_lengths);
         this.left_bound = this.get_angled_points(this.origin.x, this.origin.y, 135, this.bound_lengths);
@@ -413,9 +413,9 @@ function create_cube_once(w, l , h, cx, cy) {
 
 
 function init(){ 
-    var width = 100;
-    var length = 100;
-    var height = 100;
+    var width = 200;
+    var length = 200;
+    var height = 200;
     var mid_x = innerWidth/2;
     var mid_y = innerHeight/2;
     
